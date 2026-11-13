@@ -1,0 +1,29 @@
+CRM DB CONSÓRCIOS — PACOTE PARA IMPLANTAÇÃO
+
+ESTADO: código preparado para PostgreSQL, ainda não hospedado nem testado com um PostgreSQL real. O arquivo HTML sozinho NÃO é um CRM compartilhado: é necessário executar o servidor e conectar o banco. Não utilize dados de clientes até concluir testes, revisão de segurança e configuração de hospedagem.
+
+O que está incluído:
+- Quadro de leads com etapas, vendedor, situação, dados de crédito, objeções e histórico.
+- Quatro usuários individuais: supervisor, fabiola, stefhane e graziela. Todos podem ver, editar e excluir todos os leads.
+- Dados persistentes em PostgreSQL; atualização periódica e proteção contra edição simultânea sobrescrevendo outra edição.
+- Exportação JSON e CSV; não há restauração de backup pelo painel. Faça também backups próprios do PostgreSQL e teste o procedimento de restauração.
+
+PASSOS GERAIS DE IMPLANTAÇÃO NO RAILWAY
+1. Crie uma conta em https://railway.com/ e confira os preços e requisitos de cobrança antes de contratar. Uma conta GitHub pode facilitar o envio dos arquivos.
+2. Crie um repositório PRIVADO no GitHub e envie SOMENTE index.html, server.py, requirements.txt, Dockerfile e .dockerignore. Não coloque senhas no repositório.
+3. Crie um projeto no Railway e adicione um banco PostgreSQL. Aguarde sua inicialização.
+4. No mesmo projeto, crie um serviço a partir do repositório privado. O Dockerfile fornece a configuração de execução.
+5. Nas variáveis do serviço do CRM, configure DATABASE_URL como referência à variável DATABASE_URL do serviço PostgreSQL. Use o seletor de referência do Railway e confira que é a URL interna correta.
+6. Ainda nas variáveis do CRM, configure SENHA_SUPERVISOR, SENHA_FABIOLA, SENHA_STEFHANE e SENHA_GRAZIELA. Escolha senhas fortes e DIFERENTES, com pelo menos 12 caracteres, e compartilhe cada senha de forma privada, não por repositório nem por chat público. As contas só são criadas quando não existem no banco. Alterar essas variáveis depois não altera senhas de contas existentes; os usuários devem usar “Alterar senha” dentro do CRM. Preserve a URL do banco e não a divulgue.
+7. Implante o serviço e consulte os logs para verificar a inicialização. Em Settings / Networking, crie um domínio público com HTTPS conforme a interface do Railway.
+8. Acesse o domínio por HTTPS e teste os quatro logins, a inclusão, edição, troca de etapa e exclusão de um lead fictício em dois dispositivos. Teste também se os dados continuam presentes após reiniciar o serviço. Remova o lead fictício após o teste.
+9. Cada usuário deve trocar sua senha inicial. Depois, remova as quatro variáveis de senha inicial apenas quando confirmar que os quatro usuários já foram criados no banco e que todos conseguem acessar. Mantenha DATABASE_URL configurada.
+10. Configure backups periódicos do PostgreSQL, retenção, teste de restauração e monitoramento. Um projeto de hospedagem não é um substituto para backups.
+
+SEGURANÇA E LIMITAÇÕES
+- Este projeto é um protótipo e precisa de revisão técnica e testes de segurança antes de receber dados reais e ser publicado. Recomenda-se um profissional para validar HTTPS, autenticação, política de senhas, controle de acessos, recuperação de conta, proteção contra ataques, disponibilidade, backups e LGPD.
+- O controle de tentativas de login funciona apenas em memória em cada instância e não substitui uma proteção centralizada de produção. Configure uma única instância ou proteção de rate limiting externa.
+- O acesso é coletivo: qualquer um dos quatro usuários pode ver, alterar e excluir todos os leads. Não há trilha de auditoria automática de alterações.
+- Os avisos de retorno aparecem no painel. Não enviam notificações ou mensagens automáticas.
+- A exportação JSON/CSV inclui dados pessoais em arquivos sem criptografia. Restrinja acesso, transmita com segurança e mantenha uma política de retenção.
+- O projeto não inclui redefinição de senha por e-mail, autenticação em dois fatores, integração com WhatsApp ou restauração de backup na interface.
